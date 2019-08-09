@@ -9,19 +9,24 @@ namespace DownpatcherSharp
 {
     public static class Helpers
     {
+        /// <summary>
+        /// A function that writes the given error to disk at 'C:\{gameName}Patcher.log'.
+        /// </summary>
+        /// <param name="gameName">The name of the game</param>
+        /// <param name="ex">The exception to write to disk</param>
         public static void writeErrorToDisk(string gameName, Exception ex)
         {
-            using (StreamWriter writer = new StreamWriter(string.Format(@"C:\{0}Patcher.log", gameName), false))
+            using (StreamWriter errorWriter = new StreamWriter(string.Format(@"C:\{0}Patcher.log", gameName), false))
             {
-                writer.WriteLine("-----------------------------------------------------------------------------");
-                writer.WriteLine("Date : " + DateTime.Now.ToString());
-                writer.WriteLine();
+                errorWriter.WriteLine("-----------------------------------------------------------------------------");
+                errorWriter.WriteLine("Date : " + DateTime.Now.ToString());
+                errorWriter.WriteLine();
 
                 while (ex != null)
                 {
-                    writer.WriteLine(ex.GetType().FullName);
-                    writer.WriteLine("Message : " + ex.Message);
-                    writer.WriteLine("StackTrace : " + ex.StackTrace);
+                    errorWriter.WriteLine(ex.GetType().FullName);
+                    errorWriter.WriteLine("Message : " + ex.Message);
+                    errorWriter.WriteLine("StackTrace : " + ex.StackTrace);
 
                     ex = ex.InnerException;
                 }

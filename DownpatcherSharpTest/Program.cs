@@ -14,8 +14,22 @@ namespace DownpatcherSharpTest
     {
         static void Main(string[] args)
         {
-            TestingGame game = new TestingGame(@"C:\test", "test");
+            TestingGame game = new TestingGame(Directory.GetCurrentDirectory() + "\\testingGame", "test");
+            Console.WriteLine("Current Patch: " + game.getCurrentPatch());
+            string availablePatches = string.Join(", ", game.getPatches());
+            Console.WriteLine("Available Patches: " + availablePatches);
+            foreach (string patch in game.getPatches())
+            {
+                Console.WriteLine("----");
+                Console.WriteLine("Patching To: " + patch);
+                game.setCurrentPatch(patch);
 
+                Console.WriteLine("Current Patch: " + game.getCurrentPatch());
+            }
+            Console.WriteLine("----");
+
+            Console.WriteLine("Waiting...");
+            Console.ReadLine();
         }
     }
 
@@ -25,7 +39,8 @@ namespace DownpatcherSharpTest
 
         public override string getCurrentPatch()
         {
-            return FileVersionInfo.GetVersionInfo(gameDir.FullName + "\\test.exe").FileVersion;
+            FileVersionInfo versionInfo = FileVersionInfo.GetVersionInfo(gameDir.FullName + "\\test.exe");
+            return versionInfo.ProductVersion;
         }
     }
 }
