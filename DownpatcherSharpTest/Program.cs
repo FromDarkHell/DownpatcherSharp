@@ -28,6 +28,8 @@ namespace DownpatcherSharpTest
             }
             Console.WriteLine("----");
 
+            Console.WriteLine("Reading Registry Key: " + game.getFilePath());
+
             Console.WriteLine("Waiting...");
             Console.ReadLine();
         }

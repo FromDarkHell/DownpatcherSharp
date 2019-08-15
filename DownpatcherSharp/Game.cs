@@ -1,8 +1,8 @@
 ﻿using System.Text.RegularExpressions;
 using System.Collections.Generic;
-using System.IO;
+using Microsoft.Win32;
 using System.Linq;
-using System;
+using System.IO;
 
 namespace DownpatcherSharp
 {
@@ -14,19 +14,19 @@ namespace DownpatcherSharp
     {
         #region Properties
         public List<Patch> patches = new List<Patch>();
-        public string currentVersion;
-
         public DirectoryInfo gameDir;
+        public string currentVersion;
         public string gameName;
+
         #endregion
 
         #region Constructors
         public Game(string filePath, string gameName)
         {
-            gameDir = new DirectoryInfo(filePath);
             this.gameName = gameName;
-            currentVersion = getCurrentPatch();
+            setCurrentFilePath(filePath);
             initalizePatches();
+            currentVersion = getCurrentPatch();
         }
         #endregion
 
@@ -85,6 +85,37 @@ namespace DownpatcherSharp
         /// <returns>The current patch</returns>
         public abstract string getCurrentPatch();
 
+        #region File Path Stuff
+
+        /// <summary>
+        /// A function to set the current file path to a specific file path.
+        /// </summary>
+        /// <param name="filePath">The string representation of the file path of the game</param>
+        public void setCurrentFilePath(string filePath)
+        {
+            this.gameDir = new DirectoryInfo(filePath);
+            // If we couldn't write the key to the registry, it doesn't *really* matter.
+            try
+            {
+                RegistryKey rkey = Registry.CurrentUser.CreateSubKey("DownpatcherSharp");
+                rkey.SetValue(gameName, filePath);
+            }
+            catch { }
+        }
+
+        public string getRegistryFilePath()
+        {
+            try
+            {
+                RegistryKey rkey = Registry.CurrentUser.OpenSubKey("DownpatcherSharp");
+                if (rkey != null)
+                    return ((string)rkey.GetValue(gameName));
+            }
+            catch { }
+
+            return null;
+        }
+        #endregion
 
         #endregion
     }
