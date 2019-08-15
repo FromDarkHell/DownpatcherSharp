@@ -31,6 +31,8 @@ namespace DownpatcherSharp
         #endregion
 
         #region Functions
+
+        #region Patch Handling
         private void initalizePatches()
         {
             DirectoryInfo basePatchDirectory = new DirectoryInfo(Directory.GetCurrentDirectory() + "\\Patch Data\\");
@@ -84,6 +86,7 @@ namespace DownpatcherSharp
         /// </summary>
         /// <returns>The current patch</returns>
         public abstract string getCurrentPatch();
+        #endregion
 
         #region File Path Stuff
 
