@@ -116,7 +116,7 @@ namespace DownpatcherSharp
             }
             catch { }
 
-            return null;
+            return "";
         }
         #endregion
 
