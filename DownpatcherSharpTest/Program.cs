@@ -18,7 +18,7 @@ namespace DownpatcherSharpTest
                 Console.WriteLine("----");
                 Console.WriteLine("Patching To: " + patch);
                 game.setCurrentPatch(patch);
-
+                Console.ReadKey();
                 Console.WriteLine("Current Patch: " + game.getCurrentPatch());
             }
             Console.WriteLine("----");

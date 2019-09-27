@@ -48,19 +48,19 @@ namespace DownpatcherSharp
         {
             try
             {
-                foreach (FileInfo file in patchDirectory.GetFiles())
+                foreach (FileInfo file in patchDirectory.EnumerateFiles("*.*", SearchOption.AllDirectories))
                 {
                     string[] fileNames = null;
                     bool deleteFiles = file.Name.Equals("filesToDelete.patch");
                     bool addFiles = file.Name.Equals("filesToAdd.patch");
                     if (deleteFiles || addFiles) fileNames = File.ReadAllLines(file.FullName);
-                    else fileNames = new string[] { file.Name };
-                    foreach (FileInfo gameFile in game.gameDir.GetFiles())
+                    else fileNames = new string[] { file.FullName };
+                    foreach (FileInfo gameFile in game.gameDir.EnumerateFiles("*.*", SearchOption.AllDirectories))
                     {
                         foreach (string fileName in fileNames)
                         {
                             if (deleteFiles && Regex.IsMatch(gameFile.Name, fileName, RegexOptions.Compiled)) gameFile.Delete();
-                            else if (!deleteFiles && gameFile.Name.Equals(fileName)) File.Copy(file.FullName, gameFile.FullName, true);
+                            else if (!deleteFiles && gameFile.FullName.Split(new string[] { game.gameDir.FullName }, StringSplitOptions.None)[1].Equals(fileName.Split(new string[] { patchDirectory.FullName }, StringSplitOptions.None)[1])) File.Copy(file.FullName, gameFile.FullName, true);
                             else if (addFiles)
                             {
                                 foreach (FileInfo patchFile in patchDirectory.GetFiles())
