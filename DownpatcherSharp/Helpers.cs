@@ -12,7 +12,8 @@ namespace DownpatcherSharp
         /// <param name="ex">The exception to write to disk</param>
         public static void writeErrorToDisk(string gameName, Exception ex)
         {
-            using (StreamWriter errorWriter = new StreamWriter(string.Format(@"C:\{0}Patcher.log", gameName), false))
+            string filePath = Path.Combine(Path.GetTempPath(), string.Format("{0}Patcher.log", gameName));
+            using (StreamWriter errorWriter = File.CreateText(filePath))
             {
                 errorWriter.WriteLine("-----------------------------------------------------------------------------");
                 errorWriter.WriteLine("Date : " + DateTime.Now.ToString());
