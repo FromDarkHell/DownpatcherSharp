@@ -41,6 +41,7 @@ namespace DownpatcherSharp
         /// </summary>
         public string versionNumber { get; set; }
         #endregion
+        
         /// <summary>
         /// A function that patches the game to the current Patch object.
         /// </summary>
@@ -55,20 +56,32 @@ namespace DownpatcherSharp
                     bool addFiles = file.Name.Equals("filesToAdd.patch");
                     if (deleteFiles || addFiles) fileNames = File.ReadAllLines(file.FullName);
                     else fileNames = new string[] { file.FullName };
+
+                    if (addFiles) { // Adding files that weren't there in the previous patch
+                        foreach (string fileName in fileNames) {
+                            foreach (FileInfo patchFile in patchDirectory.GetFiles("*.*", SearchOption.AllDirectories)) {
+                                if (Regex.IsMatch(patchFile.Name, fileName, RegexOptions.Compiled)) {
+                                    string outFile = game.gameDir.FullName + patchFile.FullName.Replace(patchDirectory.FullName, "");
+                                    Directory.CreateDirectory(Path.GetDirectoryName(outFile)); // Make directory if doesn't exist
+                                    File.Copy(patchFile.FullName, outFile, true);
+                                }
+                            }
+                        }
+                        continue;
+                    }
+
                     foreach (FileInfo gameFile in game.gameDir.EnumerateFiles("*.*", SearchOption.AllDirectories))
                     {
                         foreach (string fileName in fileNames)
                         {
-                            if (deleteFiles && Regex.IsMatch(gameFile.Name, fileName, RegexOptions.Compiled)) gameFile.Delete();
-                            else if (!deleteFiles && gameFile.FullName.Split(new string[] { game.gameDir.FullName }, StringSplitOptions.None)[1].Equals(fileName.Split(new string[] { patchDirectory.FullName }, StringSplitOptions.None)[1])) File.Copy(file.FullName, gameFile.FullName, true);
-                            else if (addFiles)
-                            {
-                                foreach (FileInfo patchFile in patchDirectory.GetFiles())
-                                {
-                                    if (Regex.IsMatch(patchFile.Name, fileName, RegexOptions.Compiled))
-                                        File.Copy(patchFile.FullName, gameFile.FullName.Replace(gameFile.Name, "") + patchFile.Name, true);
-                                }
+                            if (deleteFiles && Regex.IsMatch(gameFile.Name, fileName, RegexOptions.Compiled)) { // Deleting files
+                                gameFile.Delete();
                             }
+                            else if (!deleteFiles) { // Replacing files
+                                if (gameFile.FullName.Replace(game.gameDir.FullName, "").Equals(fileName.Replace(patchDirectory.FullName, ""))) {
+                                    File.Copy(file.FullName, gameFile.FullName, true);
+                                }
+                            } 
                         }
                     }
                 }
