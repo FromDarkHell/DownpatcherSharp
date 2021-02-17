@@ -49,6 +49,18 @@ namespace DownpatcherSharp
                 // We didn't change anything so the patch version == directory name.
                 else patches.Add(new Patch(this, patchName));
             }
+
+            foreach(Patch patch in patches) {
+                string f = Path.Combine(patch.patchDirectory.FullName, "subpatches.patch");
+                if (File.Exists(f)) {
+                    string[] subpatches = File.ReadAllText(f).Split('\n');
+                    foreach(string patchNum in subpatches) {
+                        var sub = patches.Where(x => x.versionNumber.Equals(patchNum));
+                        if (!sub.Any()) continue;
+                        patch.AddSubpatch(sub.First());
+                    }
+                }
+            }
         }
 
         /// <summary>
